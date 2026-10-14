@@ -1,0 +1,15 @@
+﻿#   case                            rs1          rs2 expected   actual  result
+1   official: equal                   5            5      255      255  PASS
+2   official: off by one              4            5        0        0  PASS
+3   official: negative vs 0           -1            0        0        0  PASS
+4   positive > threshold              7            3      255      255  PASS
+5   positive < threshold              3            7        0        0  PASS
+6   both zero                         0            0      255      255  PASS
+7   both negative                    -3           -5      255      255  PASS
+8   negative vs positive             -3            2        0        0  PASS
+9   positive vs negative              2           -3      255      255  PASS
+10  boundary: rs1 = INT32_MAX   2147483647   2147483646      255      255  PASS
+11  boundary: rs1 = INT32_MIN  -2147483648  -2147483647        0        0  PASS
+12  boundary: rs2 = INT32_MIN  -2147483647  -2147483648      255      255  PASS
+
+Total 12, passed 12, failed 0
