@@ -7,7 +7,7 @@
  *   - threshold_u() :實驗版,把同一組位元當作 uint32_t 做無號比較
  * 並與預期輸出比對。
  *
- * 編譯與執行(在 instructions/THRESHOLD/tests/ 底下):
+ * 編譯與執行(在 instructions/06_THRESHOLD/tests/ 底下):
  *   gcc -std=c11 -Wall -Wextra -I../c_baseline signed_vs_unsigned.c ../c_baseline/threshold.c -o signed_vs_unsigned
  *   ./signed_vs_unsigned
  *
