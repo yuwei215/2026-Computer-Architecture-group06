@@ -10,6 +10,7 @@
  *   ./test_threshold
  *
  * 注意:下面的測資必須和 threshold_tests.md 保持一致。
+ * 輸出訊息使用英文,避免 Windows 終端機的中文編碼造成亂碼。
  */
 #include <stdint.h>
 #include <stdio.h>
@@ -26,23 +27,23 @@ struct test_case {
 int main(void)
 {
     const struct test_case cases[] = {
-        {"官方:相等", 5, 5, 255},
-        {"官方:差 1", 4, 5, 0},
-        {"官方:負對 0", -1, 0, 0},
-        {"正數大於門檻", 7, 3, 255},
-        {"正數小於門檻", 3, 7, 0},
-        {"兩個都是 0", 0, 0, 255},
-        {"兩個都是負數", -3, -5, 255},
-        {"負數對正數", -3, 2, 0},
-        {"正數對負數", 2, -3, 255},
-        {"邊界:rs1 = INT32_MAX", INT32_MAX, INT32_MAX - 1, 255},
-        {"邊界:rs1 = INT32_MIN", INT32_MIN, INT32_MIN + 1, 0},
-        {"邊界:rs2 = INT32_MIN", INT32_MIN + 1, INT32_MIN, 255},
+        {"official: equal", 5, 5, 255},
+        {"official: off by one", 4, 5, 0},
+        {"official: negative vs 0", -1, 0, 0},
+        {"positive > threshold", 7, 3, 255},
+        {"positive < threshold", 3, 7, 0},
+        {"both zero", 0, 0, 255},
+        {"both negative", -3, -5, 255},
+        {"negative vs positive", -3, 2, 0},
+        {"positive vs negative", 2, -3, 255},
+        {"boundary: rs1 = INT32_MAX", INT32_MAX, INT32_MAX - 1, 255},
+        {"boundary: rs1 = INT32_MIN", INT32_MIN, INT32_MIN + 1, 0},
+        {"boundary: rs2 = INT32_MIN", INT32_MIN + 1, INT32_MIN, 255},
     };
     const int n = (int)(sizeof cases / sizeof cases[0]);
     int failed = 0;
 
-    printf("%-3s %-22s %12s %12s %8s %8s  %s\n", "#", "類型", "rs1", "rs2", "預期", "實際", "結果");
+    printf("%-3s %-22s %12s %12s %8s %8s  %s\n", "#", "case", "rs1", "rs2", "expected", "actual", "result");
     for (int i = 0; i < n; i++) {
         int32_t actual = threshold(cases[i].rs1, cases[i].rs2);
         int ok = (actual == cases[i].expected);
@@ -55,6 +56,6 @@ int main(void)
                ok ? "PASS" : "FAIL");
     }
 
-    printf("\n共 %d 組,通過 %d 組,失敗 %d 組\n", n, n - failed, failed);
+    printf("\nTotal %d, passed %d, failed %d\n", n, n - failed, failed);
     return failed != 0;
 }
