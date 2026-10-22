@@ -7,7 +7,7 @@
 - ISA:RV32IM(已取消 C 壓縮擴充)
 - 程式:`threshold_branch.s`(簡嘉佑),測試用 `main` 見 `ripes_test_branch.s`
 
-## 計數規則(待羅允辰確認,以他訂的為準)
+## 計數規則(羅允辰已確認)
 
 - 範圍:`threshold:` 到 `ret`(含 `ret`),不含測試用 `main` 與呼叫它的 `jal`
 - 以 Ripes 反組譯的真實指令計算:`ret` 實際是 `jalr x0 x1 0`,算 1 條;`li a0, 255` 是 1 條 `addi`
