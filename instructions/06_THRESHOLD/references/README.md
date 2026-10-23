@@ -12,4 +12,5 @@
 
 | 編號 | 名稱 | 來源 | 用途 |
 |---|---|---|---|
-| R1 | | | |
+| R1 | Ripes v2.3.0 | https://github.com/mortbopet/Ripes/releases/tag/v2.3.0(存取日期 2026-10-21) | CP2 組合語言驗證與指令統計(Single-cycle、RV32IM) |
+| R2 | 本課程 HOMEWORK.md | 本倉庫 [HOMEWORK.md](../../../HOMEWORK.md) 第六節 | THRESHOLD 語意與測試向量 |
