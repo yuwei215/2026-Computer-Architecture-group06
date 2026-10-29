@@ -3,14 +3,6 @@
 - 對應 Checkpoint:CP3
 - 內容:語意規格、虛擬碼、編碼範例(格式見 HOMEWORK.md 第 6.7 節)
 
-<!--
-  【範本，尚未完成】以下為 CP3 範本與提示，提交前要把所有「提示」「待填」刪掉並換成本人寫的內容。
-  分工（輪換案 A）：
-    A. 語意規格、虛擬碼、3 個範例 —— 羅允辰
-    B. 機器碼與欄位說明、指令數比較表 —— 簡嘉佑
-  上面 4 行是老師模板，不能刪。
--->
-
 ## A. 語意規格(負責:羅允辰)
 
 ### THRESHOLD
@@ -111,3 +103,67 @@
 - 左欄數字來源:`rv32im/count_result.md`(CP2,Ripes GUI 手動執行並截圖)。
 - 靜態指令由 5 條減為 2 條，動態由 3 條減為 2 條，條件分支由 1 條減為 0 條，因為 threshold 一條指令就完成比較並寫入 0 或 255,不需要 bge 和 li。
 - 自訂指令欄的數字是依規格推算,不是模擬器量到的。
+
+## D. 實作與驗證(照老師 `mac_demo` 的做法)
+
+程式由 Claude(Claude Code)撰寫,林煉棠審閱並在自己的電腦執行。結構對照老師倉庫的 `mac_demo/`。
+
+| 檔案 | 對照 `mac_demo` | 內容 |
+|---|---|---|
+| `threshold_encoding.py` | `mac_encoding.py` | 編碼、解碼、golden model、執行一條指令(`rd = x0` 不寫入) |
+| `test_threshold_encoding.py` | `test_mac_encoding.py`、`test_r4_and_x0.py` | 機器碼對照 B 段手算、欄位、官方測資、邊界值、`x0`、不會誤認 `add` 或其他 funct |
+| `threshold.h`、`riscv_probe.c` | `mac.h`、`riscv_probe.c` | 用 `.insn r 0x0b, 0, 0, rd, rs1, rs2` 讓 RISC-V gcc 產生自訂指令 |
+| `test_riscv_encoding.py` | `test_riscv_encoding.py` | RISC-V gcc 編譯 + objdump 反組譯,確認目的碼中真的有 THRESHOLD 指令 |
+| `threshold_bench.py`、`test_threshold_bench.py` | `benchmark/dotbench.py` | 二值化 N 個數字的指令數模型與加速比(CPI = 1,模型估計) |
+| `threshold_loop_rv32im.s` | — | RV32IM 迴圈版,在 Ripes 實際執行,驗證模型的基準指令數 |
+| `threshold_sim.c` | — | C 版解碼與執行(補充) |
+
+### 執行方式(VS Code 終端機,PowerShell)
+
+```powershell
+cd D:\ca-group06\instructions\06_THRESHOLD\spec
+python -B -m unittest discover -s . -p "test_*.py" -v
+python -B threshold_encoding.py
+python -B threshold_bench.py
+gcc -std=c11 -Wall -Wextra -o threshold_sim.exe threshold_sim.c
+.\threshold_sim.exe
+```
+
+RISC-V gcc 組譯檢查(WSL Ubuntu,需先安裝 `gcc-riscv64-unknown-elf`、`binutils-riscv64-unknown-elf`):
+
+```bash
+cd /mnt/d/ca-group06/instructions/06_THRESHOLD/spec
+python3 -B -m unittest test_riscv_encoding -v
+```
+
+### 指令數模型(每個元素的動態指令數)
+
+| 版本 | 迴圈本體 | 每元素 |
+|---|---|---:|
+| RV32IM 分支版(`bge`,同 CP2) | `lw`、`bge`、`li`、(`j`)、`sw`、`addi`×3、`bnez` | 成立 8、不成立 9 |
+| RV32IM 無分支版(`slt`) | `lw`、`slt`、`addi`、`andi`、`sw`、`addi`×3、`bnez` | 9 |
+| THRESHOLD | `lw`、`threshold`、`sw`、`addi`×3、`bnez` | 7 |
+
+每次執行另有固定開銷 8 條(`la`×2 = 4、`li`×2 = 2、結束 `li a7`、`ecall`)。
+
+### 驗證結果
+
+**林煉棠本人執行(2026/10/30,截圖在 `../report/figures/1114405011/`):**
+
+| 執行內容 | 環境 | 結果 | 截圖 |
+|---|---|---|---|
+| `python -B -m unittest discover -s . -p "test_*.py" -v` | Windows 11、VS Code 終端機(PowerShell)、Python 3 | 19 項通過,1 項跳過(RISC-V 組譯檢查,Windows 沒有 RISC-V gcc,改在 WSL 跑) | `cp3_unittest.png` |
+| `python3 -B -m unittest test_riscv_encoding -v` | WSL Ubuntu、`gcc-riscv64-unknown-elf`、Python 3.12 | 通過。objdump 反組譯 `threshold_probe` 得到 `00b5050b`(`.insn 4, 0x00b5050b`)與 `ret`,解碼為 rd = x10、rs1 = x10、rs2 = x11,與 B 段手算 `0x00B5050B` 一致 | `cp3_riscv_gcc_objdump.png` |
+| `.\threshold_sim.exe` | Windows、gcc(MSYS2) | 9 組全部 PASS | `cp3_threshold_sim.png` |
+| `python -B threshold_bench.py` | Windows、Python 3 | 見下方加速比 | `cp3_bench.png` |
+| Ripes GUI 執行 `threshold_loop_rv32im.s`(N = 8,門檻 5) | Ripes v2.3.0、Single-cycle processor、RV32IM | `Instrs. retired` = **77**、Cycles = 77、CPI = 1,與模型 6 + 8×3 + 9×5 + 2 = 77 一致;程式正常結束(exit code 0) | `cp3_ripes_loop_77.png` |
+| 同上,執行後在 Memory 分頁(Signed)檢查 `.data` | 同上 | `in`(`0x10000000`～`0x1000001c`)= 5, 4, −1, 2147483647, −2147483648, 0, 7, −3;`out`(`0x10000020`～`0x1000003c`)= 255, 0, 0, 255, 0, 0, 255, 0,全部正確 | `cp3_ripes_loop_out.png` |
+
+- 同樣的 N = 8,THRESHOLD 版依模型為 6 + 7×8 + 2 = 64 條,RV32IM 分支版 77 條,加速比約 **1.20×**(動態指令數比,模型估計)。
+- 較大的工作負載(`threshold_bench.py`):對分支版約 1.19～1.21×,對無分支版約 1.28×;若自訂指令讓時脈週期變慢 20%(T 比 1.2),加速比降到約 1.0×。
+
+**Claude Code 在林煉棠電腦以 Ripes 命令列模式(`--mode cli --proc RV32_SS --isaexts M`)預先執行(不是本人手動):**
+
+- `threshold_loop_rv32im.s`(N = 8,門檻 5):`Instrs. retired` = 77、輸出 255, 0, 0, 255, 0, 0, 255, 0,與上方本人 GUI 結果相同。
+- 一般 Ripes 無法執行 custom-0:把 `.word 0x00B5050B` 放進程式、`a0 = a1 = 5` 執行後,`a0` 仍是 5(預期 255),表示 Ripes 沒有執行這條指令。所以 THRESHOLD 那欄是模型推算,不是模擬器量到的。
+- 加速比小的原因:RV32IM 本來每個元素只要 8～9 條,THRESHOLD 只省掉 1～2 條;迴圈的 `lw`、`sw`、指標與計數器更新都還在。

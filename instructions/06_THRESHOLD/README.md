@@ -21,7 +21,7 @@
 | `c_baseline/` | CP1 | C 參考實作、測試程式 |
 | `tests/` | CP1–CP3 | 測資(12 組)、有號/無號比較實驗 |
 | `rv32im/` | CP2 | RV32IM 組合語言、Ripes 驗證與指令統計 |
-| `spec/` | CP3 | 語意規格、虛擬碼、編碼(尚未開始) |
+| `spec/` | CP3 | 語意規格、虛擬碼、編碼、機器碼與指令數比較;照老師 `mac_demo` 做法的編碼測試、RISC-V gcc 組譯檢查、指令數模型 |
 | `report/` | CP1–CP3 | `CP1.md`、`CP2.md`、`CP3.md` 與截圖 |
 | `references/` | — | 參考資料 |
 | `CONTRIBUTIONS.md` | — | 個人貢獻聲明 |
