@@ -107,7 +107,7 @@
 
 | 執行 | 結果 | 截圖 |
 |---|---|---|
-| Python 測試（Windows） | 19 項通過，1 項跳過（RISC-V 組譯檢查改在 WSL 跑） | ![](figures/1114405011/cp3_unittest.png) |
+| Python 測試（Windows） | 共 19 項：18 項通過，1 項跳過（RISC-V 組譯檢查改在 WSL 跑） | ![](figures/1114405011/cp3_unittest.png) |
 | RISC-V gcc 組譯檢查（WSL Ubuntu，`gcc-riscv64-unknown-elf`） | 通過；`threshold_probe` 反組譯為 `00b5050b`、`ret`，解碼為 rd = x10、rs1 = x10、rs2 = x11 | ![](figures/1114405011/cp3_riscv_gcc_objdump.png) |
 | `threshold_sim.exe` | 9 組全部 PASS（官方 3 組、邊界值、`rs2` 最小值、`t0,t0,t1`、`rd = x0`、`add` 不被誤認） | ![](figures/1114405011/cp3_threshold_sim.png) |
 | `threshold_bench.py` | 3.2 節的數字 | ![](figures/1114405011/cp3_bench.png) |

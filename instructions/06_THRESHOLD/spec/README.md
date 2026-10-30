@@ -152,7 +152,7 @@ python3 -B -m unittest test_riscv_encoding -v
 
 | 執行內容 | 環境 | 結果 | 截圖 |
 |---|---|---|---|
-| `python -B -m unittest discover -s . -p "test_*.py" -v` | Windows 11、VS Code 終端機(PowerShell)、Python 3 | 19 項通過,1 項跳過(RISC-V 組譯檢查,Windows 沒有 RISC-V gcc,改在 WSL 跑) | `cp3_unittest.png` |
+| `python -B -m unittest discover -s . -p "test_*.py" -v` | Windows 11、VS Code 終端機(PowerShell)、Python 3 | 共 19 項:18 項通過,1 項跳過(RISC-V 組譯檢查,Windows 沒有 RISC-V gcc,改在 WSL 跑) | `cp3_unittest.png` |
 | `python3 -B -m unittest test_riscv_encoding -v` | WSL Ubuntu、`gcc-riscv64-unknown-elf`、Python 3.12 | 通過。objdump 反組譯 `threshold_probe` 得到 `00b5050b`(`.insn 4, 0x00b5050b`)與 `ret`,解碼為 rd = x10、rs1 = x10、rs2 = x11,與 B 段手算 `0x00B5050B` 一致 | `cp3_riscv_gcc_objdump.png` |
 | `.\threshold_sim.exe` | Windows、gcc(MSYS2) | 9 組全部 PASS | `cp3_threshold_sim.png` |
 | `python -B threshold_bench.py` | Windows、Python 3 | 見下方加速比 | `cp3_bench.png` |
